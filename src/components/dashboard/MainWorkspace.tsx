@@ -2,9 +2,11 @@
 
 import { useState } from "react";
 import type { Database } from "@/lib/supabase/types";
+import { POST_TYPE_LABELS } from "@/lib/prompts";
 import ScriptEditor from "@/components/ScriptEditor";
 import ShortCard from "./ShortCard";
 import NewShortModal from "./NewShortModal";
+import VideoPostModal from "./VideoPostModal";
 
 type Creator = Database["public"]["Tables"]["creators"]["Row"];
 type Episode = Database["public"]["Tables"]["episodes"]["Row"];
@@ -20,7 +22,20 @@ interface MainWorkspaceProps {
   episodes: Episode[];
 }
 
-const tabs = ["Shorts queue", "Published", "Templates", "Analytics"] as const;
+const tabs = ["All", "Episode shorts", "Video posts", "Published", "Analytics"] as const;
+
+function filterShorts(shorts: Short[], tab: string): Short[] {
+  switch (tab) {
+    case "Episode shorts":
+      return shorts.filter((s) => !s.post_type || s.post_type === "episode_short");
+    case "Video posts":
+      return shorts.filter((s) => s.post_type && s.post_type !== "episode_short");
+    case "Published":
+      return shorts.filter((s) => s.status === "done");
+    default:
+      return shorts;
+  }
+}
 
 export default function MainWorkspace({
   creator,
@@ -33,8 +48,13 @@ export default function MainWorkspace({
 }: MainWorkspaceProps) {
   const [activeTab, setActiveTab] = useState<string>(tabs[0]);
   const [showNewShort, setShowNewShort] = useState(false);
+  const [showVideoPost, setShowVideoPost] = useState(false);
 
   const activeShort = episodeShorts.find((s) => s.id === activeShortId) ?? null;
+  const filteredShorts = filterShorts(episodeShorts, activeTab);
+
+  const isVideoPost =
+    activeShort?.post_type && activeShort.post_type !== "episode_short";
 
   // Stats
   const thisMonth = episodeShorts.filter((s) => {
@@ -97,15 +117,16 @@ export default function MainWorkspace({
           )}
         </div>
         <button
-          className="text-[12px] px-3 py-1.5 rounded-lg border transition-colors hover:bg-gray-50"
+          onClick={() => setShowVideoPost(true)}
+          className="text-[12px] px-3 py-1.5 rounded-lg border transition-colors hover:bg-[#7AB3D0]/5"
           style={{
             fontFamily: "Montserrat, sans-serif",
             fontWeight: 600,
-            color: "#3D5A70",
-            borderColor: "#D8DDE5",
+            color: "#7AB3D0",
+            borderColor: "#7AB3D0",
           }}
         >
-          Import transcript
+          New Video Post
         </button>
         <button
           onClick={() => setShowNewShort(true)}
@@ -176,6 +197,9 @@ export default function MainWorkspace({
             episodeTitle={episode?.title ?? ""}
             transcript={episode?.transcript_text ?? undefined}
             creatorId={creator.id}
+            postType={activeShort.post_type ?? undefined}
+            postTitle={activeShort.post_title ?? undefined}
+            postBullets={activeShort.post_bullets ?? undefined}
           />
         )}
 
@@ -208,20 +232,21 @@ export default function MainWorkspace({
 
         {/* Shorts grid */}
         <div className="grid grid-cols-3 gap-4">
-          {episodeShorts.map((s) => (
+          {filteredShorts.map((s) => (
             <ShortCard
               key={s.id}
               short={s}
               episodeNumber={
-                episodes.length -
-                episodes.findIndex((e) => e.id === s.episode_id)
+                s.episode_id
+                  ? episodes.length - episodes.findIndex((e) => e.id === s.episode_id)
+                  : 0
               }
               isActive={s.id === activeShortId}
               creatorName={creator.name}
               onClick={() => onSelectShort(s.id)}
             />
           ))}
-          {episodeShorts.length === 0 && (
+          {filteredShorts.length === 0 && (
             <div
               className="col-span-3 text-center py-12 rounded-xl border border-dashed"
               style={{ borderColor: "#D8DDE5", color: "#6B6B6B" }}
@@ -236,7 +261,7 @@ export default function MainWorkspace({
                 className="text-xs"
                 style={{ fontFamily: "'Roboto Condensed', sans-serif" }}
               >
-                Click &quot;+ Add script&quot; to create your first short
+                Click &quot;+ Add script&quot; or &quot;New Video Post&quot; to get started
               </p>
             </div>
           )}
@@ -249,6 +274,14 @@ export default function MainWorkspace({
           episodes={episodes}
           defaultEpisodeId={episode?.id ?? null}
           onClose={() => setShowNewShort(false)}
+          onCreated={onAddShort}
+        />
+      )}
+
+      {showVideoPost && (
+        <VideoPostModal
+          creatorId={creator.id}
+          onClose={() => setShowVideoPost(false)}
           onCreated={onAddShort}
         />
       )}

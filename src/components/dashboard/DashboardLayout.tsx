@@ -33,7 +33,9 @@ export default function DashboardLayout({
 
   const activeShort = shorts.find((s) => s.id === activeShortId) ?? null;
   const activeEpisode = episodes.find((e) => e.id === activeEpisodeId) ?? null;
-  const episodeShorts = shorts.filter((s) => s.episode_id === activeEpisodeId);
+  const episodeShorts = shorts.filter(
+    (s) => s.episode_id === activeEpisodeId || !s.episode_id
+  );
 
   const updateShortInState = useCallback(
     (payload: { eventType: string; new: Record<string, unknown>; old: Record<string, unknown> }) => {

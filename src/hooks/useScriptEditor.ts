@@ -15,9 +15,20 @@ export function useScriptEditor(shortId: string, creatorId: string) {
   // 150 words per minute average speaking rate
   const estimatedSeconds = Math.round((wordCount / 150) * 60);
 
-  function generate(episodeTitle: string, transcript?: string) {
+  function generate(
+    episodeTitle: string,
+    transcript?: string,
+    opts?: { postType?: string; postTitle?: string; postBullets?: string }
+  ) {
     complete("", {
-      body: { shortId, creatorId, episodeTitle, transcript, action: "generate" },
+      body: {
+        shortId,
+        creatorId,
+        episodeTitle,
+        transcript,
+        action: "generate",
+        ...opts,
+      },
     });
   }
 

@@ -2,12 +2,16 @@
 
 import { useState, useEffect } from "react";
 import { useScriptEditor } from "@/hooks/useScriptEditor";
+import { POST_TYPE_LABELS } from "@/lib/prompts";
 
 interface ScriptEditorProps {
   shortId: string;
   episodeTitle: string;
   transcript?: string;
   creatorId: string;
+  postType?: string;
+  postTitle?: string;
+  postBullets?: string;
 }
 
 export default function ScriptEditor({
@@ -15,11 +19,16 @@ export default function ScriptEditor({
   episodeTitle,
   transcript,
   creatorId,
+  postType,
+  postTitle,
+  postBullets,
 }: ScriptEditorProps) {
   const { script, isLoading, wordCount, estimatedSeconds, generate, rewrite } =
     useScriptEditor(shortId, creatorId);
 
   const [editableScript, setEditableScript] = useState("");
+
+  const isVideoPost = postType && postType !== "episode_short";
 
   useEffect(() => {
     if (script) {
@@ -37,22 +46,45 @@ export default function ScriptEditor({
       )
     : estimatedSeconds;
 
+  function handleGenerate() {
+    if (isVideoPost) {
+      generate(postTitle ?? "", undefined, { postType, postTitle, postBullets });
+    } else {
+      generate(episodeTitle, transcript);
+    }
+  }
+
   return (
     <div
       className="rounded-xl p-5 border"
       style={{ background: "#FFFFFF", borderColor: "#D8DDE5" }}
     >
       <div className="flex items-center justify-between mb-3">
-        <h3
-          className="text-[14px]"
-          style={{
-            fontFamily: "Montserrat, sans-serif",
-            fontWeight: 700,
-            color: "#0D1B2A",
-          }}
-        >
-          Script Editor
-        </h3>
+        <div className="flex items-center gap-2">
+          <h3
+            className="text-[14px]"
+            style={{
+              fontFamily: "Montserrat, sans-serif",
+              fontWeight: 700,
+              color: "#0D1B2A",
+            }}
+          >
+            Script Editor
+          </h3>
+          {isVideoPost && (
+            <span
+              className="px-2 py-0.5 rounded text-[10px] uppercase tracking-wider"
+              style={{
+                fontFamily: "Montserrat, sans-serif",
+                fontWeight: 600,
+                color: "#7AB3D0",
+                background: "rgba(122,179,208,.12)",
+              }}
+            >
+              {POST_TYPE_LABELS[postType] ?? postType}
+            </span>
+          )}
+        </div>
         <div className="flex gap-2">
           <span
             className="px-2 py-0.5 rounded text-[10px] uppercase tracking-wider"
@@ -97,7 +129,7 @@ export default function ScriptEditor({
 
       <div className="flex flex-col gap-2.5 mt-3">
         <button
-          onClick={() => generate(episodeTitle, transcript)}
+          onClick={handleGenerate}
           disabled={isLoading}
           className="w-full py-2.5 rounded-lg text-sm text-white transition-colors disabled:opacity-50"
           style={{

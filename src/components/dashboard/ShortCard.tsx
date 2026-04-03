@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { Database } from "@/lib/supabase/types";
+import { POST_TYPE_LABELS } from "@/lib/prompts";
 
 type Short = Database["public"]["Tables"]["shorts"]["Row"];
 
@@ -39,6 +40,7 @@ export default function ShortCard({
 }: ShortCardProps) {
   const [showPreview, setShowPreview] = useState(false);
   const cfg = statusConfig[short.status] ?? statusConfig.draft;
+  const isVideoPost = short.post_type && short.post_type !== "episode_short";
 
   const wordCount = short.script_text
     ? short.script_text.trim().split(/\s+/).filter(Boolean).length
@@ -88,17 +90,30 @@ export default function ShortCard({
             </div>
           )}
 
-          {/* Episode badge */}
-          <span
-            className="absolute top-2 left-2 px-1.5 py-0.5 rounded text-[9px] text-white"
-            style={{
-              background: "#C0272D",
-              fontFamily: "Montserrat, sans-serif",
-              fontWeight: 700,
-            }}
-          >
-            EP {episodeNumber}
-          </span>
+          {/* Badge: post type or episode number */}
+          {isVideoPost ? (
+            <span
+              className="absolute top-2 left-2 px-1.5 py-0.5 rounded text-[9px] text-white"
+              style={{
+                background: "#7AB3D0",
+                fontFamily: "Montserrat, sans-serif",
+                fontWeight: 700,
+              }}
+            >
+              {POST_TYPE_LABELS[short.post_type!] ?? short.post_type}
+            </span>
+          ) : (
+            <span
+              className="absolute top-2 left-2 px-1.5 py-0.5 rounded text-[9px] text-white"
+              style={{
+                background: "#C0272D",
+                fontFamily: "Montserrat, sans-serif",
+                fontWeight: 700,
+              }}
+            >
+              EP {episodeNumber}
+            </span>
+          )}
 
           {/* Progress bar */}
           <div
@@ -135,7 +150,9 @@ export default function ShortCard({
               color: "#0D1B2A",
             }}
           >
-            {short.script_text?.slice(0, 60) || "No script yet"}
+            {isVideoPost
+              ? short.post_title || short.script_text?.slice(0, 60) || "No title"
+              : short.script_text?.slice(0, 60) || "No script yet"}
           </p>
           <div className="flex items-center gap-1.5 flex-wrap">
             <span

@@ -3,6 +3,7 @@ import { anthropic } from "@ai-sdk/anthropic";
 import { NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { Database } from "@/lib/supabase/types";
+import { buildVideoPostPrompt } from "@/lib/prompts";
 
 type ShortsUpdate = Database["public"]["Tables"]["shorts"]["Update"];
 type Action = "generate" | "punchier" | "shorter" | "add_cta" | "new_hook";
@@ -14,6 +15,9 @@ interface RequestBody {
   creatorId: string;
   action: Action;
   currentScript?: string;
+  postType?: string;
+  postTitle?: string;
+  postBullets?: string;
 }
 
 function buildUserMessage(body: RequestBody): string {
@@ -74,7 +78,27 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const systemPrompt = `You write YouTube Shorts scripts for ${creator.name}, host of ${creator.show_name ?? "their show"}.
+    let systemPrompt: string;
+    let userMessage: string;
+
+    // Video post mode — use specialized prompt template
+    if (
+      body.action === "generate" &&
+      body.postType &&
+      body.postType !== "episode_short"
+    ) {
+      systemPrompt = buildVideoPostPrompt(
+        creator.name,
+        creator.show_name ?? "their show",
+        creator.system_prompt,
+        body.postType,
+        body.postTitle ?? "",
+        body.postBullets ?? ""
+      );
+      userMessage = "Write the script now.";
+    } else {
+      // Existing episode short logic
+      systemPrompt = `You write YouTube Shorts scripts for ${creator.name}, host of ${creator.show_name ?? "their show"}.
 
 Voice and tone: ${creator.system_prompt}
 
@@ -87,7 +111,8 @@ Rules — follow all of these exactly:
 - Write as if speaking directly to camera — first person, present tense
 - Return ONLY the script. No preamble, no explanation, no quotes around it.`;
 
-    const userMessage = buildUserMessage(body);
+      userMessage = buildUserMessage(body);
+    }
 
     const result = streamText({
       model: anthropic("claude-sonnet-4-20250514"),
@@ -95,7 +120,6 @@ Rules — follow all of these exactly:
       messages: [{ role: "user", content: userMessage }],
       maxOutputTokens: 300,
       onFinish: async ({ text }) => {
-        // Save the generated script to the short record
         await supabase
           .from("shorts")
           .update({ script_text: text } satisfies ShortsUpdate)

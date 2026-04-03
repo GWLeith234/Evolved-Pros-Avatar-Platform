@@ -81,10 +81,13 @@ export interface Database {
       shorts: {
         Row: {
           id: string;
-          episode_id: string;
+          episode_id: string | null;
           creator_id: string;
           script_text: string | null;
           status: ShortStatus;
+          post_type: string | null;
+          post_title: string | null;
+          post_bullets: string | null;
           elevenlabs_audio_url: string | null;
           heygen_video_id: string | null;
           heygen_video_url: string | null;
@@ -95,10 +98,13 @@ export interface Database {
         };
         Insert: {
           id?: string;
-          episode_id: string;
+          episode_id?: string | null;
           creator_id: string;
           script_text?: string | null;
           status?: ShortStatus;
+          post_type?: string | null;
+          post_title?: string | null;
+          post_bullets?: string | null;
           elevenlabs_audio_url?: string | null;
           heygen_video_id?: string | null;
           heygen_video_url?: string | null;
@@ -109,10 +115,13 @@ export interface Database {
         };
         Update: {
           id?: string;
-          episode_id?: string;
+          episode_id?: string | null;
           creator_id?: string;
           script_text?: string | null;
           status?: ShortStatus;
+          post_type?: string | null;
+          post_title?: string | null;
+          post_bullets?: string | null;
           elevenlabs_audio_url?: string | null;
           heygen_video_id?: string | null;
           heygen_video_url?: string | null;
