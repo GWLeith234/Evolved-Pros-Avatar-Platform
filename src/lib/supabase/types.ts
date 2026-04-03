@@ -17,6 +17,7 @@ export interface Database {
           show_name: string | null;
           elevenlabs_voice_id: string | null;
           synthesia_avatar_id: string | null;
+          system_prompt: string;
           created_at: string;
         };
         Insert: {
@@ -25,6 +26,7 @@ export interface Database {
           show_name?: string | null;
           elevenlabs_voice_id?: string | null;
           synthesia_avatar_id?: string | null;
+          system_prompt?: string;
           created_at?: string;
         };
         Update: {
@@ -33,6 +35,7 @@ export interface Database {
           show_name?: string | null;
           elevenlabs_voice_id?: string | null;
           synthesia_avatar_id?: string | null;
+          system_prompt?: string;
           created_at?: string;
         };
       };
