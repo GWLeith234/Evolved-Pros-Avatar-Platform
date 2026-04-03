@@ -77,6 +77,8 @@ export interface Database {
           heygen_video_id: string | null;
           heygen_video_url: string | null;
           final_mp4_url: string | null;
+          mux_asset_id: string | null;
+          mux_playback_id: string | null;
           error_message: string | null;
           created_at: string;
         };
@@ -91,6 +93,8 @@ export interface Database {
           heygen_video_id?: string | null;
           heygen_video_url?: string | null;
           final_mp4_url?: string | null;
+          mux_asset_id?: string | null;
+          mux_playback_id?: string | null;
           error_message?: string | null;
           created_at?: string;
         };
@@ -105,6 +109,8 @@ export interface Database {
           heygen_video_id?: string | null;
           heygen_video_url?: string | null;
           final_mp4_url?: string | null;
+          mux_asset_id?: string | null;
+          mux_playback_id?: string | null;
           error_message?: string | null;
           created_at?: string;
         };
