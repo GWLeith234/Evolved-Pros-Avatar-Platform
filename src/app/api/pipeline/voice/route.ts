@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import type { Database } from "@/lib/supabase/types";
+
+type ShortsUpdate = Database["public"]["Tables"]["shorts"]["Update"];
 
 export async function POST(request: NextRequest) {
   try {
@@ -17,7 +20,7 @@ export async function POST(request: NextRequest) {
     // Update status to voice_rendering
     await supabase
       .from("shorts")
-      .update({ status: "voice_rendering" } as never)
+      .update({ status: "voice_rendering" } satisfies ShortsUpdate)
       .eq("id", shortId);
 
     // Call ElevenLabs TTS with timestamps
@@ -41,7 +44,10 @@ export async function POST(request: NextRequest) {
       const errText = await elevenLabsRes.text();
       await supabase
         .from("shorts")
-        .update({ status: "error", error_message: `ElevenLabs error: ${errText}` } as never)
+        .update({
+          status: "error",
+          error_message: `ElevenLabs error: ${errText}`,
+        } satisfies ShortsUpdate)
         .eq("id", shortId);
       return NextResponse.json(
         { error: "ElevenLabs API failed", details: errText },
@@ -66,7 +72,10 @@ export async function POST(request: NextRequest) {
     if (uploadError) {
       await supabase
         .from("shorts")
-        .update({ status: "error", error_message: `Storage upload error: ${uploadError.message}` } as never)
+        .update({
+          status: "error",
+          error_message: `Storage upload error: ${uploadError.message}`,
+        } satisfies ShortsUpdate)
         .eq("id", shortId);
       return NextResponse.json(
         { error: "Failed to upload audio", details: uploadError.message },
@@ -102,7 +111,7 @@ export async function POST(request: NextRequest) {
       .update({
         elevenlabs_audio_url: audioUrl,
         status: "avatar_generating",
-      } as never)
+      } satisfies ShortsUpdate)
       .eq("id", shortId);
 
     // Fetch the short to get the creator's avatar ID
@@ -118,11 +127,11 @@ export async function POST(request: NextRequest) {
 
     const { data: creator } = await supabase
       .from("creators")
-      .select("synthesia_avatar_id")
-      .eq("id", (short as { creator_id: string }).creator_id)
-      .single() as { data: { synthesia_avatar_id: string | null } | null };
+      .select("heygen_avatar_id")
+      .eq("id", short.creator_id)
+      .single();
 
-    const avatarId = creator?.synthesia_avatar_id;
+    const avatarId = creator?.heygen_avatar_id;
 
     // Chain to avatar generation if avatarId is available
     if (avatarId) {

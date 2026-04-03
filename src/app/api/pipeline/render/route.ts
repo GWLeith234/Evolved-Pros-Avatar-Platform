@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import type { Database } from "@/lib/supabase/types";
 import { convertTimestamps } from "@/lib/captions";
 import { renderMediaOnLambda, getRenderProgress } from "@remotion/lambda/client";
 import { mux } from "@/lib/mux";
+
+type ShortsUpdate = Database["public"]["Tables"]["shorts"]["Update"];
 
 export const maxDuration = 300;
 
@@ -37,13 +40,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const typedShort = short as {
-      id: string;
-      creator_id: string;
-      heygen_video_url: string | null;
-    };
-
-    if (!typedShort.heygen_video_url) {
+    if (!short.heygen_video_url) {
       return NextResponse.json(
         { error: "Short has no HeyGen video URL" },
         { status: 400 }
@@ -51,13 +48,11 @@ export async function POST(request: NextRequest) {
     }
 
     // Fetch creator branding
-    const { data: creator } = (await supabase
+    const { data: creator } = await supabase
       .from("creators")
       .select("name, show_name")
-      .eq("id", typedShort.creator_id)
-      .single()) as {
-      data: { name: string; show_name: string | null } | null;
-    };
+      .eq("id", short.creator_id)
+      .single();
 
     // 2. Fetch timestamps.json from storage
     const { data: timestampsData, error: tsError } = await supabase.storage
@@ -125,7 +120,7 @@ export async function POST(request: NextRequest) {
       serveUrl: process.env.REMOTION_SERVE_URL!,
       composition: "Short",
       inputProps: {
-        avatarVideoUrl: typedShort.heygen_video_url,
+        avatarVideoUrl: short.heygen_video_url,
         captions,
         creatorName: creator?.name ?? "Creator",
         showName: creator?.show_name ?? "",
@@ -153,7 +148,7 @@ export async function POST(request: NextRequest) {
           .update({
             status: "error",
             error_message: `Remotion render failed: ${progress.errors?.[0]?.message ?? "unknown error"}`,
-          } as never)
+          } satisfies ShortsUpdate)
           .eq("id", shortId);
         return NextResponse.json(
           { error: "Render failed", details: progress.errors },
@@ -201,10 +196,9 @@ export async function POST(request: NextRequest) {
     await supabase
       .from("shorts")
       .update({
-        final_mp4_url: publicUrlData.publicUrl,
         mux_asset_id: asset.id,
         status: "compositing",
-      } as never)
+      } satisfies ShortsUpdate)
       .eq("id", shortId);
 
     return NextResponse.json({

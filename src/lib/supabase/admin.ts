@@ -6,7 +6,7 @@ import type { Database } from "./types";
  * Only use in server-side API routes, never expose to the browser.
  */
 export function createAdminClient() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+  const url = process.env.SUPABASE_URL!;
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
   return createSupabaseClient<Database>(url, serviceKey, {

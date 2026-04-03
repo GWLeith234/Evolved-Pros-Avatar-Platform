@@ -2,7 +2,9 @@ import { streamText } from "ai";
 import { anthropic } from "@ai-sdk/anthropic";
 import { NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import type { Database } from "@/lib/supabase/types";
 
+type ShortsUpdate = Database["public"]["Tables"]["shorts"]["Update"];
 type Action = "generate" | "punchier" | "shorter" | "add_cta" | "new_hook";
 
 interface RequestBody {
@@ -59,14 +61,11 @@ export async function POST(request: NextRequest) {
     const supabase = createAdminClient();
 
     // Fetch creator
-    const { data: creator, error: creatorError } = (await supabase
+    const { data: creator, error: creatorError } = await supabase
       .from("creators")
       .select("name, show_name, system_prompt")
       .eq("id", body.creatorId)
-      .single()) as {
-      data: { name: string; show_name: string | null; system_prompt: string } | null;
-      error: { message: string } | null;
-    };
+      .single();
 
     if (creatorError || !creator) {
       return new Response(
@@ -99,7 +98,7 @@ Rules — follow all of these exactly:
         // Save the generated script to the short record
         await supabase
           .from("shorts")
-          .update({ script_text: text } as never)
+          .update({ script_text: text } satisfies ShortsUpdate)
           .eq("id", body.shortId);
       },
     });

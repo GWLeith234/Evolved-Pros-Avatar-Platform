@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import type { Database } from "@/lib/supabase/types";
 import { mux } from "@/lib/mux";
+
+type ShortsUpdate = Database["public"]["Tables"]["shorts"]["Update"];
 
 export async function POST(request: NextRequest) {
   try {
@@ -40,7 +43,7 @@ export async function POST(request: NextRequest) {
         .update({
           mux_playback_id: playbackId,
           status: "done",
-        } as never)
+        } satisfies ShortsUpdate)
         .eq("id", shortId);
 
       return NextResponse.json({ success: true, status: "done" });
@@ -63,7 +66,7 @@ export async function POST(request: NextRequest) {
         .update({
           status: "error",
           error_message: errorMessage,
-        } as never)
+        } satisfies ShortsUpdate)
         .eq("id", shortId);
 
       return NextResponse.json({ success: true, status: "error" });

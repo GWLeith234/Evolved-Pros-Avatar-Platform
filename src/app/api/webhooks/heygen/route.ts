@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import type { Database } from "@/lib/supabase/types";
 import crypto from "crypto";
+
+type ShortsUpdate = Database["public"]["Tables"]["shorts"]["Update"];
 
 function verifyHeyGenSignature(
   payload: string,
@@ -72,7 +75,7 @@ export async function POST(request: NextRequest) {
           .update({
             status: "error",
             error_message: `Failed to download HeyGen video: ${videoRes.status}`,
-          } as never)
+          } satisfies ShortsUpdate)
           .eq("id", callbackId);
         return NextResponse.json(
           { error: "Failed to download video" },
@@ -97,7 +100,7 @@ export async function POST(request: NextRequest) {
           .update({
             status: "error",
             error_message: `Storage upload error: ${uploadError.message}`,
-          } as never)
+          } satisfies ShortsUpdate)
           .eq("id", callbackId);
         return NextResponse.json(
           { error: "Failed to upload video to storage" },
@@ -116,7 +119,7 @@ export async function POST(request: NextRequest) {
         .update({
           heygen_video_url: publicUrlData.publicUrl,
           status: "compositing",
-        } as never)
+        } satisfies ShortsUpdate)
         .eq("id", callbackId);
 
       // Trigger the render pipeline
@@ -143,7 +146,7 @@ export async function POST(request: NextRequest) {
         .update({
           status: "error",
           error_message: errorMessage,
-        } as never)
+        } satisfies ShortsUpdate)
         .eq("id", callbackId);
 
       return NextResponse.json({ success: true, status: "error" });

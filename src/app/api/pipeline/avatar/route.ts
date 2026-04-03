@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import type { Database } from "@/lib/supabase/types";
+
+type ShortsUpdate = Database["public"]["Tables"]["shorts"]["Update"];
 
 export async function POST(request: NextRequest) {
   try {
@@ -43,7 +46,10 @@ export async function POST(request: NextRequest) {
       const errText = await heygenRes.text();
       await supabase
         .from("shorts")
-        .update({ status: "error", error_message: `HeyGen error: ${errText}` } as never)
+        .update({
+          status: "error",
+          error_message: `HeyGen error: ${errText}`,
+        } satisfies ShortsUpdate)
         .eq("id", shortId);
       return NextResponse.json(
         { error: "HeyGen API failed", details: errText },
@@ -60,7 +66,7 @@ export async function POST(request: NextRequest) {
         .update({
           status: "error",
           error_message: "HeyGen did not return a video_id",
-        } as never)
+        } satisfies ShortsUpdate)
         .eq("id", shortId);
       return NextResponse.json(
         { error: "No video_id in HeyGen response", details: result },
@@ -71,7 +77,7 @@ export async function POST(request: NextRequest) {
     // Store heygen_video_id; status stays 'avatar_generating' until webhook fires
     await supabase
       .from("shorts")
-      .update({ heygen_video_id: videoId } as never)
+      .update({ heygen_video_id: videoId } satisfies ShortsUpdate)
       .eq("id", shortId);
 
     return NextResponse.json({
