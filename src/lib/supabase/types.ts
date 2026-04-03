@@ -74,6 +74,8 @@ export interface Database {
           status: ShortStatus;
           elevenlabs_audio_url: string | null;
           synthesia_video_url: string | null;
+          heygen_video_id: string | null;
+          heygen_video_url: string | null;
           final_mp4_url: string | null;
           error_message: string | null;
           created_at: string;
@@ -86,6 +88,8 @@ export interface Database {
           status?: ShortStatus;
           elevenlabs_audio_url?: string | null;
           synthesia_video_url?: string | null;
+          heygen_video_id?: string | null;
+          heygen_video_url?: string | null;
           final_mp4_url?: string | null;
           error_message?: string | null;
           created_at?: string;
@@ -98,6 +102,8 @@ export interface Database {
           status?: ShortStatus;
           elevenlabs_audio_url?: string | null;
           synthesia_video_url?: string | null;
+          heygen_video_id?: string | null;
+          heygen_video_url?: string | null;
           final_mp4_url?: string | null;
           error_message?: string | null;
           created_at?: string;
