@@ -147,6 +147,174 @@ export interface Database {
           },
         ];
       };
+      habits: {
+        Row: {
+          id: string;
+          user_id: string;
+          title: string;
+          pillar_ids: string[];
+          xp_value: number;
+          leverage_score: number;
+          is_active: boolean;
+          sort_order: number;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          title: string;
+          pillar_ids?: string[];
+          xp_value?: number;
+          leverage_score?: number;
+          is_active?: boolean;
+          sort_order?: number;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          title?: string;
+          pillar_ids?: string[];
+          xp_value?: number;
+          leverage_score?: number;
+          is_active?: boolean;
+          sort_order?: number;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "habits_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      habit_logs: {
+        Row: {
+          id: string;
+          habit_id: string;
+          user_id: string;
+          completed_on: string;
+          xp_earned: number;
+          bonus_xp: number;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          habit_id: string;
+          user_id: string;
+          completed_on?: string;
+          xp_earned?: number;
+          bonus_xp?: number;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          habit_id?: string;
+          user_id?: string;
+          completed_on?: string;
+          xp_earned?: number;
+          bonus_xp?: number;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "habit_logs_habit_id_fkey";
+            columns: ["habit_id"];
+            isOneToOne: false;
+            referencedRelation: "habits";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "habit_logs_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      daily_scores: {
+        Row: {
+          id: string;
+          user_id: string;
+          score_date: string;
+          total_xp: number;
+          habits_done: number;
+          habits_total: number;
+          streak_day: number;
+          pillar_xp: Record<string, number>;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          score_date?: string;
+          total_xp?: number;
+          habits_done?: number;
+          habits_total?: number;
+          streak_day?: number;
+          pillar_xp?: Record<string, number>;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          score_date?: string;
+          total_xp?: number;
+          habits_done?: number;
+          habits_total?: number;
+          streak_day?: number;
+          pillar_xp?: Record<string, number>;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "daily_scores_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      streak_records: {
+        Row: {
+          id: string;
+          user_id: string;
+          streak_start: string;
+          streak_end: string | null;
+          streak_length: number;
+          is_active: boolean;
+          is_personal_best: boolean;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          streak_start: string;
+          streak_end?: string | null;
+          streak_length?: number;
+          is_active?: boolean;
+          is_personal_best?: boolean;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          streak_start?: string;
+          streak_end?: string | null;
+          streak_length?: number;
+          is_active?: boolean;
+          is_personal_best?: boolean;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "streak_records_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;
