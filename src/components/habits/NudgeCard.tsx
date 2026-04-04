@@ -13,21 +13,24 @@ interface Props {
 
 export default function NudgeCard({ habits, completedIds, pillarStats }: Props) {
   // Hide if all done
+  if (completedIds.size >= habits.length && habits.length > 0) return null;
+
   const incomplete = habits.filter((h) => !completedIds.has(h.id));
   if (incomplete.length === 0) return null;
 
-  // Find highest leverage incomplete, tiebreak by weakest pillar
+  // Score: leverage + 2 bonus if any tagged pillar < 50%
   const ranked = [...incomplete].sort((a, b) => {
-    if (b.leverage_score !== a.leverage_score) return b.leverage_score - a.leverage_score;
-    // Weakest pillar tiebreak
-    const aMin = Math.min(...a.pillar_ids.map((p) => pillarStats[p]?.pct ?? 0));
-    const bMin = Math.min(...b.pillar_ids.map((p) => pillarStats[p]?.pct ?? 0));
-    return aMin - bMin; // lower pillar pct = higher priority
+    const aBonus = a.pillar_ids.some((p) => (pillarStats[p]?.pct ?? 0) < 50) ? 2 : 0;
+    const bBonus = b.pillar_ids.some((p) => (pillarStats[p]?.pct ?? 0) < 50) ? 2 : 0;
+    return (b.leverage_score + bBonus) - (a.leverage_score + aBonus);
   });
 
   const nudge = ranked[0];
-  const nudgePillar = nudge.pillar_ids[0];
-  const color = PILLAR_COLORS[nudgePillar] ?? "#EF0E30";
+  // Find weakest tagged pillar
+  const weakest = [...nudge.pillar_ids].sort(
+    (a, b) => (pillarStats[a]?.pct ?? 0) - (pillarStats[b]?.pct ?? 0)
+  )[0];
+  const color = PILLAR_COLORS[weakest ?? nudge.pillar_ids[0]] ?? "#EF0E30";
 
   return (
     <div
@@ -54,6 +57,12 @@ export default function NudgeCard({ habits, completedIds, pillarStats }: Props) 
           style={{ fontFamily: "'Barlow', sans-serif", color: "#fff" }}
         >
           {nudge.title}
+          {weakest && (
+            <span style={{ color: "rgba(255,255,255,0.4)" }}>
+              {" "}
+              — would lift your {weakest} pillar
+            </span>
+          )}
         </span>
       </div>
       <span
