@@ -30,6 +30,7 @@ export default function SignUpPage() {
       return;
     }
 
+    router.refresh();
     router.push("/dashboard");
   }
 
