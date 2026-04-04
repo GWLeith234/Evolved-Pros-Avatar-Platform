@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback, useRef, useEffect } from "react";
+import Link from "next/link";
 import type { Database } from "@/lib/supabase/types";
 import CompoundHero from "./CompoundHero";
 import WeekBar from "./WeekBar";
@@ -248,6 +249,13 @@ export default function CompoundBoardClient({
       <canvas ref={canvasRef} className="fixed inset-0 pointer-events-none z-[9999]" />
 
       <div className="max-w-2xl mx-auto px-4 pt-6">
+        <Link
+          href="/dashboard"
+          className="inline-flex items-center gap-1.5 text-[11px] mb-4 transition-colors hover:text-white/60"
+          style={{ fontFamily: "'Barlow Condensed', sans-serif", color: "rgba(255,255,255,0.35)" }}
+        >
+          ← Dashboard
+        </Link>
         <CompoundHero compoundXP={compoundXP} nextMilestone={nextMilestone} pillarQuotes={Object.values(PILLAR_QUOTES)} />
         <WeekBar weekScores={weekScores} includeWeekends={includeWeekends} />
 

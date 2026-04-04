@@ -6,6 +6,17 @@ export default function CompoundBoardLocked() {
       className="min-h-screen relative overflow-hidden"
       style={{ background: "#0A0F18" }}
     >
+      {/* Back link */}
+      <div className="absolute top-4 left-4 z-10">
+        <Link
+          href="/dashboard"
+          className="text-[11px] transition-colors hover:text-white/60"
+          style={{ fontFamily: "'Barlow Condensed', sans-serif", color: "rgba(255,255,255,0.35)" }}
+        >
+          ← Dashboard
+        </Link>
+      </div>
+
       {/* Blurred preview */}
       <div
         className="absolute inset-0 opacity-40"
