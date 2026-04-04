@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import type { Database } from "@/lib/supabase/types";
 
-type Creator = Database["public"]["Tables"]["creators"]["Row"];
+type Creator = Database["public"]["Tables"]["users"]["Row"];
 
 interface DashboardHeaderProps {
   creator: Creator;

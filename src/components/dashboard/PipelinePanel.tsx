@@ -3,7 +3,7 @@
 import type { Database } from "@/lib/supabase/types";
 import { usePipeline } from "@/hooks/usePipeline";
 
-type Creator = Database["public"]["Tables"]["creators"]["Row"];
+type Creator = Database["public"]["Tables"]["users"]["Row"];
 type Short = Database["public"]["Tables"]["shorts"]["Row"];
 
 interface PipelinePanelProps {

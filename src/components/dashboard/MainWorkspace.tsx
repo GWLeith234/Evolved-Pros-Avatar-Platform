@@ -8,7 +8,7 @@ import ShortCard from "./ShortCard";
 import NewShortModal from "./NewShortModal";
 import VideoPostModal from "./VideoPostModal";
 
-type Creator = Database["public"]["Tables"]["creators"]["Row"];
+type Creator = Database["public"]["Tables"]["users"]["Row"];
 type Episode = Database["public"]["Tables"]["episodes"]["Row"];
 type Short = Database["public"]["Tables"]["shorts"]["Row"];
 

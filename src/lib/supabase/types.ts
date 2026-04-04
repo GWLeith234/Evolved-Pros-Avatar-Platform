@@ -10,7 +10,7 @@ export type ShortStatus =
 export interface Database {
   public: {
     Tables: {
-      creators: {
+      users: {
         Row: {
           id: string;
           name: string;
@@ -76,7 +76,7 @@ export interface Database {
             foreignKeyName: "episodes_creator_id_fkey";
             columns: ["creator_id"];
             isOneToOne: false;
-            referencedRelation: "creators";
+            referencedRelation: "users";
             referencedColumns: ["id"];
           },
         ];
@@ -145,7 +145,7 @@ export interface Database {
             foreignKeyName: "shorts_creator_id_fkey";
             columns: ["creator_id"];
             isOneToOne: false;
-            referencedRelation: "creators";
+            referencedRelation: "users";
             referencedColumns: ["id"];
           },
         ];
@@ -189,7 +189,7 @@ export interface Database {
             foreignKeyName: "habits_user_id_fkey";
             columns: ["user_id"];
             isOneToOne: false;
-            referencedRelation: "creators";
+            referencedRelation: "users";
             referencedColumns: ["id"];
           },
         ];
@@ -234,7 +234,7 @@ export interface Database {
             foreignKeyName: "habit_logs_user_id_fkey";
             columns: ["user_id"];
             isOneToOne: false;
-            referencedRelation: "creators";
+            referencedRelation: "users";
             referencedColumns: ["id"];
           },
         ];
@@ -275,7 +275,7 @@ export interface Database {
             foreignKeyName: "daily_scores_user_id_fkey";
             columns: ["user_id"];
             isOneToOne: false;
-            referencedRelation: "creators";
+            referencedRelation: "users";
             referencedColumns: ["id"];
           },
         ];
@@ -313,7 +313,7 @@ export interface Database {
             foreignKeyName: "streak_records_user_id_fkey";
             columns: ["user_id"];
             isOneToOne: false;
-            referencedRelation: "creators";
+            referencedRelation: "users";
             referencedColumns: ["id"];
           },
         ];

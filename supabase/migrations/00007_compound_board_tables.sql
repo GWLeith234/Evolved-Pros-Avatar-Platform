@@ -6,7 +6,7 @@
 -- 1. habits
 CREATE TABLE IF NOT EXISTS habits (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id uuid NOT NULL REFERENCES creators(id) ON DELETE CASCADE,
+  user_id uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   title text NOT NULL,
   pillar_ids text[] NOT NULL DEFAULT '{}',
   xp_value int NOT NULL DEFAULT 10 CHECK (xp_value BETWEEN 5 AND 25),
@@ -29,7 +29,7 @@ CREATE POLICY "habits_delete" ON habits FOR DELETE USING (auth.uid() = user_id);
 CREATE TABLE IF NOT EXISTS habit_logs (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   habit_id uuid NOT NULL REFERENCES habits(id) ON DELETE CASCADE,
-  user_id uuid NOT NULL REFERENCES creators(id) ON DELETE CASCADE,
+  user_id uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   completed_on date NOT NULL DEFAULT CURRENT_DATE,
   xp_earned int NOT NULL DEFAULT 10,
   bonus_xp int NOT NULL DEFAULT 0,
@@ -49,7 +49,7 @@ CREATE POLICY "habit_logs_delete" ON habit_logs FOR DELETE USING (auth.uid() = u
 -- 3. daily_scores
 CREATE TABLE IF NOT EXISTS daily_scores (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id uuid NOT NULL REFERENCES creators(id) ON DELETE CASCADE,
+  user_id uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   score_date date NOT NULL DEFAULT CURRENT_DATE,
   total_xp int NOT NULL DEFAULT 0,
   habits_done int NOT NULL DEFAULT 0,
@@ -69,7 +69,7 @@ CREATE POLICY "daily_scores_update" ON daily_scores FOR UPDATE USING (auth.uid()
 -- 4. streak_records
 CREATE TABLE IF NOT EXISTS streak_records (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id uuid NOT NULL REFERENCES creators(id) ON DELETE CASCADE,
+  user_id uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   streak_start date NOT NULL,
   streak_end date,
   streak_length int NOT NULL DEFAULT 1,
@@ -135,7 +135,7 @@ FOR EACH ROW EXECUTE FUNCTION calculate_daily_score();
 -- 6. Seed habits for George
 INSERT INTO habits (user_id, title, pillar_ids, xp_value, leverage_score, sort_order)
 SELECT u.id, h.title, h.pillar_ids, h.xp_value, h.leverage_score, h.sort_order
-FROM creators u, (VALUES
+FROM users u, (VALUES
   ('Morning prayer / meditation', ARRAY['foundation','identity'], 15, 3, 1),
   ('Walk the dog — 30 min',        ARRAY['mental','execution'],    20, 4, 2),
   ('Journal 3 pages',              ARRAY['identity','accountability'], 10, 2, 3),

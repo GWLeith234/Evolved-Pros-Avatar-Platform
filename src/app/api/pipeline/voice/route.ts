@@ -126,7 +126,7 @@ export async function POST(request: NextRequest) {
     }
 
     const { data: creator } = await supabase
-      .from("creators")
+      .from("users")
       .select("heygen_avatar_id")
       .eq("id", short.creator_id)
       .single();

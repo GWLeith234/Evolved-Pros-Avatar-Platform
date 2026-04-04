@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
 
     // Fetch creator
     const { data: creator, error: creatorError } = await supabase
-      .from("creators")
+      .from("users")
       .select("name, show_name, system_prompt")
       .eq("id", body.creatorId)
       .single();

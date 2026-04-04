@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
 
     // Fetch creator branding
     const { data: creator } = await supabase
-      .from("creators")
+      .from("users")
       .select("name, show_name")
       .eq("id", short.creator_id)
       .single();

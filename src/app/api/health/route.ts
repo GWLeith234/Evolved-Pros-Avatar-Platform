@@ -11,7 +11,7 @@ export async function GET() {
 
     // Test 2: Try to query creators table (will return empty if not authed)
     const { error: creatorsError } = await supabase
-      .from("creators")
+      .from("users")
       .select("id")
       .limit(1);
 

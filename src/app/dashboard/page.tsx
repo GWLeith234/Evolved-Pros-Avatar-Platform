@@ -3,7 +3,7 @@ import type { Database } from "@/lib/supabase/types";
 import { redirect } from "next/navigation";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 
-type Creator = Database["public"]["Tables"]["creators"]["Row"];
+type Creator = Database["public"]["Tables"]["users"]["Row"];
 type Episode = Database["public"]["Tables"]["episodes"]["Row"];
 type Short = Database["public"]["Tables"]["shorts"]["Row"];
 
@@ -19,7 +19,7 @@ export default async function DashboardPage() {
 
   // Fetch current creator
   const { data: creator } = (await supabase
-    .from("creators")
+    .from("users")
     .select("*")
     .eq("id", user.id)
     .single()) as { data: Creator | null };
@@ -30,7 +30,7 @@ export default async function DashboardPage() {
 
   // Fetch all creators (for switcher)
   const { data: creators } = (await supabase
-    .from("creators")
+    .from("users")
     .select("*")
     .order("name")) as { data: Creator[] | null };
 

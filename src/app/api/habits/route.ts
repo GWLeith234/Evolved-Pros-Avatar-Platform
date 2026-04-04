@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
 
     // Tier check
     const { data: creator } = await supabase
-      .from("creators")
+      .from("users")
       .select("tier")
       .eq("id", user.id)
       .single();

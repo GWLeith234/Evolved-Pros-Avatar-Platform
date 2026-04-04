@@ -8,7 +8,7 @@ import EpisodeSidebar from "./EpisodeSidebar";
 import MainWorkspace from "./MainWorkspace";
 import PipelinePanel from "./PipelinePanel";
 
-type Creator = Database["public"]["Tables"]["creators"]["Row"];
+type Creator = Database["public"]["Tables"]["users"]["Row"];
 type Episode = Database["public"]["Tables"]["episodes"]["Row"];
 type Short = Database["public"]["Tables"]["shorts"]["Row"];
 

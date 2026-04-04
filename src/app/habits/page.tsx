@@ -22,7 +22,7 @@ export default async function HabitsPage() {
 
   // Fetch creator (user) + tier
   const { data: creator } = await supabase
-    .from("creators")
+    .from("users")
     .select("*")
     .eq("id", user.id)
     .single();
