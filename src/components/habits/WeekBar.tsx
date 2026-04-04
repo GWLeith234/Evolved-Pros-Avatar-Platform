@@ -7,16 +7,16 @@ type DailyScore = Database["public"]["Tables"]["daily_scores"]["Row"];
 interface Props {
   weekScores: DailyScore[];
   threshold?: number;
+  includeWeekends?: boolean;
 }
 
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
-export default function WeekBar({ weekScores, threshold = 0.7 }: Props) {
+export default function WeekBar({ weekScores, threshold = 0.7, includeWeekends = false }: Props) {
   const today = new Date();
-  const todayDay = today.getDay(); // 0=Sun
-  const todayIdx = todayDay === 0 ? 6 : todayDay - 1; // 0=Mon
+  const todayDay = today.getDay();
+  const todayIdx = todayDay === 0 ? 6 : todayDay - 1;
 
-  // Build a map of day index → score
   const scoreMap = new Map<number, DailyScore>();
   for (const s of weekScores) {
     const d = new Date(s.score_date + "T12:00:00");
@@ -37,11 +37,15 @@ export default function WeekBar({ weekScores, threshold = 0.7 }: Props) {
             ? score.habits_done / score.habits_total >= threshold
             : false;
 
+        let opacity = 1;
+        if (isFuture) opacity = 0.4;
+        else if (isWeekend && !isToday && !includeWeekends) opacity = 0.2;
+
         return (
           <div
             key={label}
             className="flex flex-col items-center gap-1.5 flex-1"
-            style={{ opacity: isFuture ? 0.4 : isWeekend && !isToday ? 0.6 : 1 }}
+            style={{ opacity }}
           >
             <span
               className="text-[10px] uppercase"

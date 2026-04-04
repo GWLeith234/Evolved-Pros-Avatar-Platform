@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef, useEffect, useState } from "react";
 import type { Database } from "@/lib/supabase/types";
 import { PILLAR_COLORS } from "@/lib/pillars";
 
@@ -8,15 +9,68 @@ type Habit = Database["public"]["Tables"]["habits"]["Row"];
 interface Props {
   habit: Habit;
   completed: boolean;
-  onToggle: (id: string) => void;
+  onToggle: (id: string, el: HTMLElement) => void;
   index: number;
+  bonusXP?: number;
+  draggable?: boolean;
+  onDragStart?: (e: React.DragEvent, id: string) => void;
+  onDragOver?: (e: React.DragEvent) => void;
+  onDrop?: (e: React.DragEvent, id: string) => void;
+  onDragEnd?: () => void;
 }
 
-export default function HabitCard({ habit, completed, onToggle, index }: Props) {
+export default function HabitCard({
+  habit,
+  completed,
+  onToggle,
+  index,
+  bonusXP,
+  draggable,
+  onDragStart,
+  onDragOver,
+  onDrop,
+  onDragEnd,
+}: Props) {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const mountedRef = useRef(false);
+  const [showBonus, setShowBonus] = useState(false);
+
+  // Stagger load animation — only on initial mount
+  useEffect(() => {
+    if (mountedRef.current) return;
+    mountedRef.current = true;
+    const el = cardRef.current;
+    if (!el) return;
+    el.style.opacity = "0";
+    el.style.transform = "translateY(14px)";
+    const delay = index * 60 + 320;
+    const timer = setTimeout(() => {
+      el.style.transition = "opacity 0.4s ease, transform 0.4s ease";
+      el.style.opacity = "1";
+      el.style.transform = "translateY(0)";
+    }, delay);
+    return () => clearTimeout(timer);
+  }, [index]);
+
+  // Bonus XP badge auto-hide
+  useEffect(() => {
+    if (bonusXP && bonusXP > 0) {
+      setShowBonus(true);
+      const t = setTimeout(() => setShowBonus(false), 3000);
+      return () => clearTimeout(t);
+    }
+  }, [bonusXP]);
+
   return (
     <div
-      onClick={() => onToggle(habit.id)}
-      className="flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer select-none"
+      ref={cardRef}
+      onClick={() => cardRef.current && onToggle(habit.id, cardRef.current)}
+      draggable={draggable}
+      onDragStart={(e) => onDragStart?.(e, habit.id)}
+      onDragOver={(e) => onDragOver?.(e)}
+      onDrop={(e) => onDrop?.(e, habit.id)}
+      onDragEnd={onDragEnd}
+      className="relative flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer select-none overflow-hidden"
       style={{
         background: "#112535",
         border: "1px solid rgba(255,255,255,0.06)",
@@ -24,6 +78,32 @@ export default function HabitCard({ habit, completed, onToggle, index }: Props) 
         transform: completed ? "scale(0.98)" : "scale(1)",
       }}
     >
+      {/* Shimmer overlay */}
+      {completed && (
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background: "linear-gradient(90deg, transparent, rgba(10,191,163,0.07), transparent)",
+            animation: "shimmer 3s ease-in-out infinite",
+          }}
+        />
+      )}
+
+      {/* Bonus XP badge */}
+      {showBonus && bonusXP && bonusXP > 0 && (
+        <div
+          className="absolute -top-1 right-3 text-[10px] font-bold px-1.5 py-0.5 rounded z-10"
+          style={{
+            fontFamily: "'Barlow Condensed', sans-serif",
+            color: "#C9A84C",
+            background: "rgba(201,168,76,0.15)",
+            animation: "bob 1.5s ease-in-out infinite",
+          }}
+        >
+          +{bonusXP} BONUS
+        </div>
+      )}
+
       {/* Check circle */}
       <div
         className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 transition-all duration-300"
@@ -89,7 +169,7 @@ export default function HabitCard({ habit, completed, onToggle, index }: Props) 
 
       {/* XP badge */}
       <span
-        className="text-[11px] font-semibold px-2 py-0.5 rounded-md transition-all duration-300"
+        className="text-[11px] font-semibold px-2 py-0.5 rounded-md transition-all duration-300 relative z-[1]"
         style={{
           fontFamily: "'Barlow Condensed', sans-serif",
           color: completed ? "#0A0F18" : "#fff",
