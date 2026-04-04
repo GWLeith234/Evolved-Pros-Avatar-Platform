@@ -18,6 +18,7 @@ export interface Database {
           elevenlabs_voice_id: string | null;
           heygen_avatar_id: string | null;
           system_prompt: string;
+          tier: string;
           created_at: string;
         };
         Insert: {
@@ -27,6 +28,7 @@ export interface Database {
           elevenlabs_voice_id?: string | null;
           heygen_avatar_id?: string | null;
           system_prompt?: string;
+          tier?: string;
           created_at?: string;
         };
         Update: {
@@ -36,6 +38,7 @@ export interface Database {
           elevenlabs_voice_id?: string | null;
           heygen_avatar_id?: string | null;
           system_prompt?: string;
+          tier?: string;
           created_at?: string;
         };
         Relationships: [];
