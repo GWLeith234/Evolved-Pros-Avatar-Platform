@@ -189,7 +189,7 @@ export interface Database {
             foreignKeyName: "habits_user_id_fkey";
             columns: ["user_id"];
             isOneToOne: false;
-            referencedRelation: "users";
+            referencedRelation: "creators";
             referencedColumns: ["id"];
           },
         ];
@@ -234,7 +234,7 @@ export interface Database {
             foreignKeyName: "habit_logs_user_id_fkey";
             columns: ["user_id"];
             isOneToOne: false;
-            referencedRelation: "users";
+            referencedRelation: "creators";
             referencedColumns: ["id"];
           },
         ];
@@ -275,7 +275,7 @@ export interface Database {
             foreignKeyName: "daily_scores_user_id_fkey";
             columns: ["user_id"];
             isOneToOne: false;
-            referencedRelation: "users";
+            referencedRelation: "creators";
             referencedColumns: ["id"];
           },
         ];
@@ -313,7 +313,7 @@ export interface Database {
             foreignKeyName: "streak_records_user_id_fkey";
             columns: ["user_id"];
             isOneToOne: false;
-            referencedRelation: "users";
+            referencedRelation: "creators";
             referencedColumns: ["id"];
           },
         ];
