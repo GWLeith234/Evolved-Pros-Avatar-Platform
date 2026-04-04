@@ -33,11 +33,16 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Protect /dashboard routes — redirect unauthenticated users to login
-  if (request.nextUrl.pathname.startsWith("/dashboard") && !user) {
-    const loginUrl = request.nextUrl.clone();
-    loginUrl.pathname = "/auth/login";
-    return NextResponse.redirect(loginUrl);
+  // Protect /dashboard and /habits routes — redirect unauthenticated users to login
+  if (
+    (request.nextUrl.pathname.startsWith("/dashboard") ||
+     request.nextUrl.pathname.startsWith("/habits")) &&
+    !user
+  ) {
+    const host = request.headers.get("x-forwarded-host") || request.headers.get("host");
+    const proto = request.headers.get("x-forwarded-proto") || "https";
+    const baseUrl = `${proto}://${host}`;
+    return NextResponse.redirect(new URL("/auth/login", baseUrl));
   }
 
   return supabaseResponse;
