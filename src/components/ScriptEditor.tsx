@@ -9,6 +9,7 @@ interface ScriptEditorProps {
   episodeTitle: string;
   transcript?: string;
   creatorId: string;
+  scriptText?: string | null;
   postType?: string;
   postTitle?: string;
   postBullets?: string;
@@ -19,6 +20,7 @@ export default function ScriptEditor({
   episodeTitle,
   transcript,
   creatorId,
+  scriptText,
   postType,
   postTitle,
   postBullets,
@@ -30,6 +32,12 @@ export default function ScriptEditor({
 
   const isVideoPost = postType && postType !== "episode_short";
 
+  // Preload saved script when switching shorts
+  useEffect(() => {
+    setEditableScript(scriptText ?? "");
+  }, [shortId, scriptText]);
+
+  // Sync streaming output as it arrives
   useEffect(() => {
     if (script) {
       setEditableScript(script);

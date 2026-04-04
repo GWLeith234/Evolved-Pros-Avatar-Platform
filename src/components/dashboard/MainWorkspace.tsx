@@ -197,6 +197,7 @@ export default function MainWorkspace({
             episodeTitle={episode?.title ?? ""}
             transcript={episode?.transcript_text ?? undefined}
             creatorId={creator.id}
+            scriptText={activeShort.script_text}
             postType={activeShort.post_type ?? undefined}
             postTitle={activeShort.post_title ?? undefined}
             postBullets={activeShort.post_bullets ?? undefined}
