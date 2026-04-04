@@ -1,35 +1,26 @@
 "use client";
 
-import { createClient } from "@/lib/supabase/client";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { signInAction } from "@/app/actions/auth";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
-  const supabase = createClient();
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     setError(null);
 
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    const result = await signInAction(email, password);
 
-    if (error) {
-      setError(error.message);
+    // Only reaches here if redirect didn't fire (i.e. error)
+    if (result?.error) {
+      setError(result.error);
       setLoading(false);
-      return;
     }
-
-    router.refresh();
-    router.push("/dashboard");
   }
 
   return (
