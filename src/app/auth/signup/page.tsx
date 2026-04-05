@@ -1,71 +1,51 @@
 "use client";
 
-import { useState } from "react";
+import { useActionState } from "react";
 import { signUpAction } from "@/app/actions/auth";
 
 export default function SignUpPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [name, setName] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-
-  async function handleSignUp(e: React.FormEvent) {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
-
-    const result = await signUpAction(email, password, name);
-
-    if (result?.error) {
-      setError(result.error);
-      setLoading(false);
-    }
-  }
+  const [state, formAction, pending] = useActionState(signUpAction, null);
 
   return (
     <main className="min-h-screen flex items-center justify-center bg-gray-950">
       <form
-        onSubmit={handleSignUp}
+        action={formAction}
         className="bg-gray-900 p-8 rounded-lg shadow-lg w-full max-w-sm space-y-4"
       >
         <h1 className="text-2xl font-bold text-white text-center">
           Sign Up
         </h1>
-        {error && (
-          <p className="text-red-400 text-sm text-center">{error}</p>
+        {state?.error && (
+          <p className="text-red-400 text-sm text-center">{state.error}</p>
         )}
         <input
           type="text"
+          name="name"
           placeholder="Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
           required
           className="w-full px-4 py-2 rounded bg-gray-800 text-white border border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
         <input
           type="email"
+          name="email"
           placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
           required
           className="w-full px-4 py-2 rounded bg-gray-800 text-white border border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
         <input
           type="password"
+          name="password"
           placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
           required
           minLength={6}
           className="w-full px-4 py-2 rounded bg-gray-800 text-white border border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
         <button
           type="submit"
-          disabled={loading}
+          disabled={pending}
           className="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded font-medium disabled:opacity-50"
         >
-          {loading ? "Creating account..." : "Sign Up"}
+          {pending ? "Creating account..." : "Sign Up"}
         </button>
         <p className="text-gray-400 text-sm text-center">
           Already have an account?{" "}

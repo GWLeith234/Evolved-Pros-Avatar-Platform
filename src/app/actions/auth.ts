@@ -1,7 +1,5 @@
 "use server";
 
-/* Server Actions for Supabase auth — login, signup, signout */
-
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
@@ -31,7 +29,17 @@ async function createActionClient() {
   );
 }
 
-export async function signInAction(email: string, password: string) {
+export async function signInAction(
+  _prevState: { error: string } | null,
+  formData: FormData
+) {
+  const email = formData.get("email") as string;
+  const password = formData.get("password") as string;
+
+  if (!email || !password) {
+    return { error: "Email and password are required" };
+  }
+
   const supabase = await createActionClient();
   const { error } = await supabase.auth.signInWithPassword({ email, password });
   if (error) return { error: error.message };
@@ -39,15 +47,22 @@ export async function signInAction(email: string, password: string) {
 }
 
 export async function signUpAction(
-  email: string,
-  password: string,
-  name: string
+  _prevState: { error: string } | null,
+  formData: FormData
 ) {
+  const email = formData.get("email") as string;
+  const password = formData.get("password") as string;
+  const name = formData.get("name") as string;
+
+  if (!email || !password) {
+    return { error: "Email and password are required" };
+  }
+
   const supabase = await createActionClient();
   const { error } = await supabase.auth.signUp({
     email,
     password,
-    options: { data: { name } },
+    options: { data: { name: name || email } },
   });
   if (error) return { error: error.message };
   redirect("/dashboard");
