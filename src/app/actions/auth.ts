@@ -4,22 +4,25 @@ import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
-function createActionClient() {
-  const cookieStore = cookies();
+async function createActionClient() {
+  const cookieStore = await cookies();
 
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        async getAll() {
-          return (await cookieStore).getAll();
+        getAll() {
+          return cookieStore.getAll();
         },
-        async setAll(cookiesToSet) {
-          const store = await cookieStore;
-          cookiesToSet.forEach(({ name, value, options }) =>
-            store.set(name, value, options)
-          );
+        setAll(cookiesToSet) {
+          try {
+            cookiesToSet.forEach(({ name, value, options }) =>
+              cookieStore.set(name, value, options)
+            );
+          } catch {
+            // May fail in read-only contexts
+          }
         },
       },
     }
@@ -27,7 +30,7 @@ function createActionClient() {
 }
 
 export async function signInAction(email: string, password: string) {
-  const supabase = createActionClient();
+  const supabase = await createActionClient();
   const { error } = await supabase.auth.signInWithPassword({ email, password });
   if (error) return { error: error.message };
   redirect("/dashboard");
@@ -38,7 +41,7 @@ export async function signUpAction(
   password: string,
   name: string
 ) {
-  const supabase = createActionClient();
+  const supabase = await createActionClient();
   const { error } = await supabase.auth.signUp({
     email,
     password,
@@ -49,7 +52,7 @@ export async function signUpAction(
 }
 
 export async function signOutAction() {
-  const supabase = createActionClient();
+  const supabase = await createActionClient();
   await supabase.auth.signOut();
   redirect("/auth/login");
 }
