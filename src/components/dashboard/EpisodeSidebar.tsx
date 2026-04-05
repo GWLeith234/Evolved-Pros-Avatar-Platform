@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import type { Database } from "@/lib/supabase/types";
 
 type Episode = Database["public"]["Tables"]["episodes"]["Row"];
@@ -18,7 +17,6 @@ const navItems = [
   { label: "New Short", icon: "+", badge: true },
   { label: "All Shorts", icon: "◫" },
   { label: "Schedule", icon: "◷" },
-  { label: "Compound Board", icon: "📈", href: "/habits" },
 ];
 
 function getEpisodeStatus(episodeId: string, shorts: Short[]) {
@@ -57,43 +55,29 @@ export default function EpisodeSidebar({
           Studio
         </span>
         <nav className="flex flex-col gap-0.5">
-          {navItems.map((item) => {
-            const cls = "flex items-center gap-2.5 px-2.5 py-[9px] rounded-lg text-left transition-colors hover:bg-white/5";
-            const style = {
-              borderLeft: item.active ? "3px solid #C0272D" : "3px solid transparent",
-              color: item.active ? "#C0272D" : "rgba(255,255,255,.6)",
-            };
-            const content = (
-              <>
-                <span className="text-sm w-4 text-center">{item.icon}</span>
-                <span className="text-[13px]" style={{ fontFamily: "'Roboto Condensed', sans-serif" }}>
-                  {item.label}
+          {navItems.map((item) => (
+            <button
+              key={item.label}
+              className="flex items-center gap-2.5 px-2.5 py-[9px] rounded-lg text-left transition-colors hover:bg-white/5"
+              style={{
+                borderLeft: item.active ? "3px solid #C0272D" : "3px solid transparent",
+                color: item.active ? "#C0272D" : "rgba(255,255,255,.6)",
+              }}
+            >
+              <span className="text-sm w-4 text-center">{item.icon}</span>
+              <span className="text-[13px]" style={{ fontFamily: "'Roboto Condensed', sans-serif" }}>
+                {item.label}
+              </span>
+              {item.badge && (
+                <span
+                  className="ml-auto text-[9px] px-1.5 py-0.5 rounded text-white"
+                  style={{ background: "#C0272D", fontFamily: "Montserrat, sans-serif", fontWeight: 700 }}
+                >
+                  +
                 </span>
-                {item.badge && (
-                  <span
-                    className="ml-auto text-[9px] px-1.5 py-0.5 rounded text-white"
-                    style={{ background: "#C0272D", fontFamily: "Montserrat, sans-serif", fontWeight: 700 }}
-                  >
-                    +
-                  </span>
-                )}
-              </>
-            );
-
-            if (item.href) {
-              return (
-                <Link key={item.label} href={item.href} className={cls} style={style}>
-                  {content}
-                </Link>
-              );
-            }
-
-            return (
-              <button key={item.label} className={cls} style={style}>
-                {content}
-              </button>
-            );
-          })}
+              )}
+            </button>
+          ))}
         </nav>
       </div>
 
