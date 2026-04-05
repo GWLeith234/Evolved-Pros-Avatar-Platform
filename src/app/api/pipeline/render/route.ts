@@ -1,9 +1,11 @@
+export const dynamic = 'force-dynamic';
+
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { Database } from "@/lib/supabase/types";
 import { convertTimestamps } from "@/lib/captions";
 import { renderMediaOnLambda, getRenderProgress } from "@remotion/lambda/client";
-import { mux } from "@/lib/mux";
+import { getMux } from "@/lib/mux";
 
 type ShortsUpdate = Database["public"]["Tables"]["shorts"]["Update"];
 
@@ -186,7 +188,7 @@ export async function POST(request: NextRequest) {
       .getPublicUrl(finalPath);
 
     // 7. Upload to Mux
-    const asset = await mux.video.assets.create({
+    const asset = await getMux().video.assets.create({
       inputs: [{ url: outputUrl }],
       playback_policy: ["public"],
       passthrough: shortId,

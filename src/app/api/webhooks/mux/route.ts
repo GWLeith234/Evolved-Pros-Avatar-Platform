@@ -1,7 +1,9 @@
+export const dynamic = 'force-dynamic';
+
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { Database } from "@/lib/supabase/types";
-import { mux } from "@/lib/mux";
+import { getMux } from "@/lib/mux";
 
 type ShortsUpdate = Database["public"]["Tables"]["shorts"]["Update"];
 
@@ -13,7 +15,7 @@ export async function POST(request: NextRequest) {
     // Verify Mux webhook signature
     let event;
     try {
-      event = mux.webhooks.unwrap(rawBody, headers, process.env.MUX_WEBHOOK_SECRET!);
+      event = getMux().webhooks.unwrap(rawBody, headers, process.env.MUX_WEBHOOK_SECRET!);
     } catch (err) {
       console.error("Mux webhook signature verification failed:", err);
       return NextResponse.json(

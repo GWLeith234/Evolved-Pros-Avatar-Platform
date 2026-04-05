@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { streamText } from "ai";
 import { anthropic } from "@ai-sdk/anthropic";
 import { NextRequest } from "next/server";
