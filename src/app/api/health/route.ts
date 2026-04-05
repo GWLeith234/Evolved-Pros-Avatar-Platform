@@ -23,7 +23,7 @@ export async function GET() {
 
     return NextResponse.json({
       status: "ok",
-      supabase_url: process.env.SUPABASE_URL ? "configured" : "missing",
+      supabase_url: process.env.NEXT_PUBLIC_SUPABASE_URL ? "configured" : "missing",
       auth: authStatus,
       tables: {
         creators: creatorsError ? `error: ${creatorsError.message}` : "accessible",
