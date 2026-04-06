@@ -125,7 +125,9 @@ export async function POST(request: NextRequest) {
         .eq("id", callbackId);
 
       // Trigger the render pipeline
-      const baseUrl = request.nextUrl.origin;
+      const host = request.headers.get("x-forwarded-host") || request.headers.get("host");
+      const proto = request.headers.get("x-forwarded-proto") || "https";
+      const baseUrl = `${proto}://${host}`;
       fetch(`${baseUrl}/api/pipeline/render`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },

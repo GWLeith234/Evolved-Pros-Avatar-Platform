@@ -137,7 +137,9 @@ export async function POST(request: NextRequest) {
 
     // Chain to avatar generation if avatarId is available
     if (avatarId) {
-      const baseUrl = request.nextUrl.origin;
+      const host = request.headers.get("x-forwarded-host") || request.headers.get("host");
+      const proto = request.headers.get("x-forwarded-proto") || "https";
+      const baseUrl = `${proto}://${host}`;
       fetch(`${baseUrl}/api/pipeline/avatar`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
