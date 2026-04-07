@@ -28,7 +28,7 @@ export async function GET() {
       supabase_url: process.env.NEXT_PUBLIC_SUPABASE_URL ? "configured" : "missing",
       auth: authStatus,
       tables: {
-        creators: creatorsError ? `error: ${creatorsError.message}` : "accessible",
+        users: creatorsError ? `error: ${creatorsError.message}` : "accessible",
         shorts: shortsError ? `error: ${shortsError.message}` : "accessible",
       },
     });
