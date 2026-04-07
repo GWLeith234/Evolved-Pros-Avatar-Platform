@@ -11,8 +11,8 @@ export async function GET() {
     const { data: user, error: authError } = await supabase.auth.getUser();
     const authStatus = authError ? "not authenticated" : `authenticated as ${user.user?.email}`;
 
-    // Test 2: Try to query creators table (will return empty if not authed)
-    const { error: creatorsError } = await supabase
+    // Test 2: Try to query users table (will return empty if not authed)
+    const { error: usersError } = await supabase
       .from("users")
       .select("id")
       .limit(1);
@@ -28,7 +28,7 @@ export async function GET() {
       supabase_url: process.env.NEXT_PUBLIC_SUPABASE_URL ? "configured" : "missing",
       auth: authStatus,
       tables: {
-        creators: creatorsError ? `error: ${creatorsError.message}` : "accessible",
+        users: usersError ? `error: ${usersError.message}` : "accessible",
         shorts: shortsError ? `error: ${shortsError.message}` : "accessible",
       },
     });
